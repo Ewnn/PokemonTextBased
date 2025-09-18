@@ -1,0 +1,14 @@
+C:\Users\Ewenn\TP\bin\Debug\net9.0\TP.exe
+C:\Users\Ewenn\TP\bin\Debug\net9.0\TP.deps.json
+C:\Users\Ewenn\TP\bin\Debug\net9.0\TP.runtimeconfig.json
+C:\Users\Ewenn\TP\bin\Debug\net9.0\TP.dll
+C:\Users\Ewenn\TP\bin\Debug\net9.0\TP.pdb
+C:\Users\Ewenn\TP\obj\Debug\net9.0\TP.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Ewenn\TP\obj\Debug\net9.0\TP.AssemblyInfoInputs.cache
+C:\Users\Ewenn\TP\obj\Debug\net9.0\TP.AssemblyInfo.cs
+C:\Users\Ewenn\TP\obj\Debug\net9.0\TP.csproj.CoreCompileInputs.cache
+C:\Users\Ewenn\TP\obj\Debug\net9.0\TP.dll
+C:\Users\Ewenn\TP\obj\Debug\net9.0\refint\TP.dll
+C:\Users\Ewenn\TP\obj\Debug\net9.0\TP.pdb
+C:\Users\Ewenn\TP\obj\Debug\net9.0\TP.genruntimeconfig.cache
+C:\Users\Ewenn\TP\obj\Debug\net9.0\ref\TP.dll
