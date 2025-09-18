@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace RPGConsole
 {
@@ -278,9 +279,21 @@ namespace RPGConsole
 
         public void UseItem()
         {
+            // PROTECTION: si inventaire vide -> message et retour
+            if (Inventory.Count == 0)
+            {
+                Console.WriteLine("Aucun item disponible.");
+                return;
+            }
+
             ShowInventory();
             Console.WriteLine("\nChoissis un item à utiliser : ");
-            int choice = int.Parse(Console.ReadLine()) - 1;
+            if (!int.TryParse(Console.ReadLine(), out int choice))
+            {
+                Console.WriteLine("Entrée invalide.");
+                return;
+            }
+            choice = choice - 1;
             if (choice >= 0 && choice < Inventory.Count) // verifi que le choix est supérieur à 0 et inferieur au nombre total d'item dans le sac
             {
                 Item item = Inventory[choice];
@@ -367,7 +380,7 @@ namespace RPGConsole
             while (player.ActivePokemon.IsAlive && enemy.IsAlive)
             {
                 // Lorsque c'est le tour du joueur
-                Console.WriteLine("\nQue veux-tu faire ?");
+                Console.WriteLine("Que veux-tu faire ?");
                 Console.WriteLine("1. Attaquer");
                 Console.WriteLine("2. Défendre");
                 Console.WriteLine("3. Utiliser un item");
@@ -394,15 +407,27 @@ namespace RPGConsole
                         break;
                 }
 
-                // Lorsque c'est le tour de l'ennemi
-                int enemyChoice = rnd.Next(1,3);
-                if (enemyChoice == 1)
+                // si l'ennemi est KO après l'action du joueur -> fin du combat et attribution XP
+                if (!enemy.IsAlive)
                 {
-                    enemy.AttackTarget(player.ActivePokemon);
+                    Console.WriteLine(player.ActivePokemon.Name + " a vaincu " + enemy.Name + " !");
+                    int xpReward = enemy.Level * 5; // IMPLEMENTATION 5 : récompense XP simple
+                    player.ActivePokemon.GainXp(xpReward);
+                    break; // on sort de la boucle avant que l'ennemi ait son tour
                 }
-                else
+
+                // l'ennemi n'attaque que s'il est encore vivant
+                if (enemy.IsAlive)
                 {
-                    enemy.Defend();
+                    int enemyChoice = rnd.Next(1,3);
+                    if (enemyChoice == 1)
+                    {
+                        enemy.AttackTarget(player.ActivePokemon);
+                    }
+                    else
+                    {
+                        enemy.Defend();
+                    }
                 }
 
                 // Verification de l'etat de sante du joueur
@@ -423,78 +448,77 @@ namespace RPGConsole
     }
 
 
-class Program
-{
-    static void Main(string[] args)
+    class Program
     {
-        Console.WriteLine("=== Bienvenue dans le RPG Pokémon Textuel ===");
-        Console.Write("Entre ton nom de dresseur : ");
-        string trainerName = Console.ReadLine();
-        Console.Write("Ton âge : ");
-        int age = int.Parse(Console.ReadLine());
-
-        // Création du joueur
-        Trainer player = new Trainer(trainerName, age);
-
-        // Choix du starter
-        Console.WriteLine("\nChoisis ton Pokémon de départ :");
-        Console.WriteLine("1. Pikachu ⚡");
-        Console.WriteLine("2. Bulbizarre 🌱");
-        Console.WriteLine("3. Salamèche 🔥");
-        Console.Write("> ");
-        string choixStarter = Console.ReadLine();
-
-        Pokemon starter;
-        switch (choixStarter)
+        static void Main(string[] args)
         {
-            case "1": starter = PokemonFactory.CreateStarter("pikachu"); break;
-            case "2": starter = PokemonFactory.CreateStarter("bulbizarre"); break;
-            case "3": starter = PokemonFactory.CreateStarter("salamèche"); break;
-            default: starter = PokemonFactory.CreateStarter("pikachu"); break;
-        }
+            Console.WriteLine("=== Bienvenue dans le RPG Pokémon Textuel ===");
+            Console.Write("Entre ton nom de dresseur : ");
+            string trainerName = Console.ReadLine();
+            Console.Write("Ton âge : ");
+            int age = int.Parse(Console.ReadLine());
 
-        player.AddPokemon(starter);
-        player.ChooseActivePokemon();
+            // Création du joueur
+            Trainer player = new Trainer(trainerName, age);
 
-        Console.WriteLine("\nTu commences l’aventure avec " + starter.Name + " !");
-        Console.WriteLine("--------------------------------");
-
-        // Boucle principale du jeu
-        bool playing = true;
-        while (playing)
-        {
-            Console.WriteLine("\n=== Menu Principal ===");
-            Console.WriteLine("1. Voir mon équipe");
-            Console.WriteLine("2. Explorer (rencontrer un Pokémon sauvage)");
-            Console.WriteLine("3. Quitter");
+            // Choix du starter
+            Console.WriteLine("\nChoisis ton Pokémon de départ :");
+            Console.WriteLine("1. Pikachu ⚡");
+            Console.WriteLine("2. Bulbizarre 🌱");
+            Console.WriteLine("3. Salamèche 🔥");
             Console.Write("> ");
-            string choix = Console.ReadLine();
+            string choixStarter = Console.ReadLine();
 
-            switch (choix)
+            Pokemon starter;
+            switch (choixStarter)
             {
-                case "1":
-                    player.ShowTeam();
-                    break;
+                case "1": starter = PokemonFactory.CreateStarter("pikachu"); break;
+                case "2": starter = PokemonFactory.CreateStarter("bulbizarre"); break;
+                case "3": starter = PokemonFactory.CreateStarter("salamèche"); break;
+                default: starter = PokemonFactory.CreateStarter("pikachu"); break;
+            }
 
-                case "2":
-                    // Rencontre d’un ennemi aléatoire
-                    EnemyPokemon ennemi = PokemonFactory.CreateWildEnemy(player.Level);
-                    Console.WriteLine("\n🌿 Un " + ennemi.Name + " sauvage apparaît !");
-                    BattleEngine combat = new BattleEngine(player, ennemi);
-                    combat.StartBattle();
-                    break;
+            player.AddPokemon(starter);
+            player.ChooseActivePokemon();
 
-                case "3":
-                    Console.WriteLine("Merci d’avoir joué !");
-                    playing = false;
-                    break;
+            Console.WriteLine("\nTu commences l’aventure avec " + starter.Name + " !");
+            Console.WriteLine("--------------------------------");
 
-                default:
-                    Console.WriteLine("Choix invalide !");
-                    break;
+            // Boucle principale du jeu
+            bool playing = true;
+            while (playing)
+            {
+                Console.WriteLine("\n=== Menu Principal ===");
+                Console.WriteLine("1. Voir mon équipe");
+                Console.WriteLine("2. Explorer (rencontrer un Pokémon sauvage)");
+                Console.WriteLine("3. Quitter");
+                Console.Write("> ");
+                string choix = Console.ReadLine();
+
+                switch (choix)
+                {
+                    case "1":
+                        player.ShowTeam();
+                        break;
+
+                    case "2":
+                        // Rencontre d’un ennemi aléatoire
+                        EnemyPokemon ennemi = PokemonFactory.CreateWildEnemy(player.Level);
+                        Console.WriteLine("\n🌿 Un " + ennemi.Name + " sauvage apparaît !");
+                        BattleEngine combat = new BattleEngine(player, ennemi);
+                        combat.StartBattle();
+                        break;
+
+                    case "3":
+                        Console.WriteLine("Merci d’avoir joué !");
+                        playing = false;
+                        break;
+
+                    default:
+                        Console.WriteLine("Choix invalide !");
+                        break;
+                }
             }
         }
     }
-}
-
 }
