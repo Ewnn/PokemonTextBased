@@ -62,13 +62,13 @@ namespace RPGConsole
             {
                 damage = 0;
             }
-            Console.WriteLine(Name + " attaque " + enemy.Name + " et inflige " + damage + " dégâts !");
+            Console.WriteLine("\n" + Name + " attaque " + enemy.Name + " et inflige " + damage + " dégâts !");
             enemy.ReceiveDamage(damage);
         }
         
         public void Defend() //Permet de se defendre d'une attaque ennemie
         {
-            Console.WriteLine(Name + " se met en posture défensive !");
+            Console.WriteLine("\n" + Name + " se met en posture défensive !");
             Defense += 2;
 
         }
@@ -81,18 +81,18 @@ namespace RPGConsole
             {
                 Hp = 0;
             }
-            Console.WriteLine(Name + " a maintenant " + Hp + "/" + MaxHp + " HP.");
+            Console.WriteLine( Name + " a maintenant " + Hp + "/" + MaxHp + " HP.");
 
             if (Hp == 0) // SI HP = 0 alors pokemon est KO
             {
-                Console.WriteLine(Name + " est KO !");
+                Console.WriteLine("\n" + Name + " est KO !");
             }
         }
 
         public void GainXp(int amount) // Permet de gagner des XPs 
         {
             Xp += amount;
-            Console.WriteLine(Name + " gagne " + amount + " XP !");
+            Console.WriteLine("\n" + Name + " gagne " + amount + " XP !");
             while (Xp >= MaxXp)
             {
                 LevelUp();
@@ -106,7 +106,7 @@ namespace RPGConsole
             MaxHp += 5;
             Attack += 2;
             Defense += 1;
-            Console.WriteLine(Name + " monte au niveau " + Level + " !");
+            Console.WriteLine("\n" + Name + " monte au niveau " + Level + " !");
             if (CanEvolve && Level >= 5) // Niveau d'evolution = 5
             {
                 Evolve();
@@ -121,7 +121,7 @@ namespace RPGConsole
             }
 
             Random rd = new Random();
-            Console.WriteLine(Name + " évolue en " + EvolutionName + " !");
+            Console.WriteLine("\n" + Name + " évolue en " + EvolutionName + " !");
             Name = EvolutionName;
             MaxHp += 5 * rd.Next(1,6);
             Attack += 3 * rd.Next(1,6);
@@ -144,12 +144,76 @@ namespace RPGConsole
             : base(name, type, level, maxHp, attack, defense, false) { }
     }
 
+    abstract class Item
+    {
+        public string Name { get; protected set; }
+        public abstract void Use(Trainer trainer, Pokemon target);
+    }
+
+    class Pokeball : Item
+    {
+        public Pokeball()
+        {
+            Name = "Pokéball";
+        }
+
+        public override void Use(Trainer trainer, Pokemon target)
+        {
+            if (target.Hp > target.MaxHp / 2)
+            {
+                Console.WriteLine("Impossible de capturer " + target.Name + ". Il n'est pas suffisamment affaibli !");
+                return;
+            }
+
+            Random rnd = new Random();
+            int chance = rnd.Next(0, target.MaxHp + 1);
+
+            if (!target.IsAlive || target.Hp < chance)
+            {
+                Console.WriteLine(" Félicitations ! " + target.Name + " a été capturé !");
+                trainer.AddPokemon(target);
+            }
+            else
+            {
+                Console.WriteLine(target.Name + " échappe à la capture.");
+            }
+        }
+    }
+
+    class Potion : Item
+    {
+        private int healAmount;
+        public Potion(int amount = 20)
+        {
+            Name = "Potion";
+            healAmount = amount;
+        }
+
+        public override void Use(Trainer trainer, Pokemon target)
+        {
+            if (!target.IsAlive)
+            {
+                Console.WriteLine("Impossible d'utiliser une potion sur un Pokémon KO !");
+                return;
+            }
+
+            target.Hp += healAmount;
+            if (target.Hp > target.MaxHp)
+            {
+                target.Hp = target.MaxHp;
+            }
+            Console.WriteLine(target.Name + " récupère " + healAmount + " HP ! HP actuel : " + target.Hp + "/" + target.MaxHp);
+        }
+    }
+
     class Trainer : ITrainerProperties
     {
         public string Name { get; private set; }
         public int Age { get; private set; }
         public int Level { get; private set; }
         public List<Pokemon> TeamList { get; private set; }
+        public List<Item> Inventory { get; private set; }
+        public Pokemon ActivePokemon { get; private set; }
 
         public string Team // propriété en lecture seule qui retourne les noms des pokemons d'un dresseur
         {
@@ -171,6 +235,7 @@ namespace RPGConsole
             this.Age = age;
             this.Level = 1;
             this.TeamList = new List<Pokemon>();
+            this.Inventory = new List<Item>();
         }
 
         public void AddPokemon(Pokemon p) //ajoute un pokemon a la liste de pokemon du dresseur
@@ -178,24 +243,62 @@ namespace RPGConsole
             TeamList.Add(p);
         }
 
-        public Pokemon ActivePokemon // permet de selectionner un pokemon pour le combat
+        public void ChooseActivePokemon() // permet de selectionner un pokemon pour le combat
         {
-            get
+            Console.WriteLine("\nChoisis un Pokémon pour le combat :");
+            for (int i = 0; i < TeamList.Count; i++)
             {
-                if (TeamList.Count > 0)
-                {
-                    return TeamList[0];
-                }
-                else
-                {
-                    return null;
-                }
+                Console.WriteLine((i + 1) + ". " + TeamList[i].Name + " | HP: " + TeamList[i].Hp + "/" + TeamList[i].MaxHp);
             }
+            Console.Write("> ");
+            int choice = int.Parse(Console.ReadLine()) - 1;
+            if (choice >= 0 && choice < TeamList.Count)
+            {
+                ActivePokemon = TeamList[choice];
+            }
+            else if (TeamList.Count > 0)
+            {
+                ActivePokemon = TeamList[0]; // valeur par défaut
+            }
+        }
+ 
+        public void AddItem(Item item)
+        {
+            Inventory.Add(item);
+        }
+
+        public void ShowInventory()
+        {
+            Console.WriteLine("\nInventaire :");
+            for (int i = 0; i < Inventory.Count; i++)
+            {
+                Console.WriteLine((i + 1) + ". " + Inventory[i].Name);
+            }
+        }
+
+        public void UseItem()
+        {
+            ShowInventory();
+            Console.WriteLine("\nChoissis un item à utiliser : ");
+            int choice = int.Parse(Console.ReadLine()) - 1;
+            if (choice >= 0 && choice < Inventory.Count) // verifi que le choix est supérieur à 0 et inferieur au nombre total d'item dans le sac
+            {
+                Item item = Inventory[choice];
+                Console.WriteLine("\nSur quel Pokémon ?");
+                ChooseActivePokemon();
+                item.Use(this, ActivePokemon); // this → le dresseur qui utilise l’objet sur le pokement cible qui est le pokemon actif
+                Inventory.RemoveAt(choice); // objet supprime de l'inventaire apres usage
+            }
+            else
+            {
+                Console.WriteLine("Item invalide !");
+            }
+
         }
 
         public void ShowTeam() // Affihce les pokemons d'un dresseur
         {
-            Console.WriteLine("Équipe de " + Name + " :");
+            Console.WriteLine("\nÉquipe de " + Name + " :");
             foreach (Pokemon p in TeamList)
             {
                 Console.WriteLine(p.Name + " | HP : " + p.Hp + "/" + p.MaxHp);
@@ -264,26 +367,31 @@ namespace RPGConsole
             while (player.ActivePokemon.IsAlive && enemy.IsAlive)
             {
                 // Lorsque c'est le tour du joueur
-                Console.WriteLine("Que veux-tu faire ?");
+                Console.WriteLine("\nQue veux-tu faire ?");
                 Console.WriteLine("1. Attaquer");
                 Console.WriteLine("2. Défendre");
+                Console.WriteLine("3. Utiliser un item");
+                Console.WriteLine("4. Lancer une Pokéball");
                 Console.Write("> ");
                 string choice = Console.ReadLine();
 
-                if (choice == "1")
+                switch (choice)
                 {
-                    player.ActivePokemon.AttackTarget(enemy);
-                }
-                else if (choice == "2")
-                {
-                    player.ActivePokemon.Defend();
-                }
-                // Verification de l'etat de sante de l'ennemi
-                if (enemy.IsAlive == false)
-                {
-                    Console.WriteLine(enemy.Name + " est vaincu !");
-                    player.ActivePokemon.GainXp(10);
-                    break;
+                    case "1":
+                        player.ActivePokemon.AttackTarget(enemy);
+                        break;
+                    case "2":
+                        player.ActivePokemon.Defend();
+                        break;
+                    case "3":
+                        player.UseItem();
+                        break;
+                    case "4":
+                        Item ball = new Pokeball();
+                        ball.Use(player, enemy);
+                        if (player.TeamList.Contains(enemy))
+                            return; // fin du combat si capture réussie
+                        break;
                 }
 
                 // Lorsque c'est le tour de l'ennemi
@@ -308,7 +416,7 @@ namespace RPGConsole
                 Console.WriteLine("État actuel :");
                 Console.WriteLine(player.ActivePokemon);
                 Console.WriteLine(enemy);
-                Console.WriteLine("--------------------");
+                Console.WriteLine("-------------------------");
 
             }
         }
@@ -326,7 +434,7 @@ class Program
         int age = int.Parse(Console.ReadLine());
 
         // Création du joueur
-        Trainer joueur = new Trainer(trainerName, age);
+        Trainer player = new Trainer(trainerName, age);
 
         // Choix du starter
         Console.WriteLine("\nChoisis ton Pokémon de départ :");
@@ -345,7 +453,8 @@ class Program
             default: starter = PokemonFactory.CreateStarter("pikachu"); break;
         }
 
-        joueur.AddPokemon(starter);
+        player.AddPokemon(starter);
+        player.ChooseActivePokemon();
 
         Console.WriteLine("\nTu commences l’aventure avec " + starter.Name + " !");
         Console.WriteLine("--------------------------------");
@@ -364,14 +473,14 @@ class Program
             switch (choix)
             {
                 case "1":
-                    joueur.ShowTeam();
+                    player.ShowTeam();
                     break;
 
                 case "2":
                     // Rencontre d’un ennemi aléatoire
-                    EnemyPokemon ennemi = PokemonFactory.CreateWildEnemy(joueur.Level);
+                    EnemyPokemon ennemi = PokemonFactory.CreateWildEnemy(player.Level);
                     Console.WriteLine("\n🌿 Un " + ennemi.Name + " sauvage apparaît !");
-                    BattleEngine combat = new BattleEngine(joueur, ennemi);
+                    BattleEngine combat = new BattleEngine(player, ennemi);
                     combat.StartBattle();
                     break;
 

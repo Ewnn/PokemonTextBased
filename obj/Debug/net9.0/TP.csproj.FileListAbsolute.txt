@@ -12,3 +12,4 @@ C:\Users\Ewenn\TP\obj\Debug\net9.0\refint\TP.dll
 C:\Users\Ewenn\TP\obj\Debug\net9.0\TP.pdb
 C:\Users\Ewenn\TP\obj\Debug\net9.0\TP.genruntimeconfig.cache
 C:\Users\Ewenn\TP\obj\Debug\net9.0\ref\TP.dll
+C:\Users\Ewenn\TP\obj\Debug\net9.0\TP.sourcelink.json
