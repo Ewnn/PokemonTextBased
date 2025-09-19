@@ -12,8 +12,8 @@ namespace RPGConsole
         int Hp { get; set; }
         int MaxXp { get; }
         int Xp { get; set; }
-        int Attack { get; set; } // modifié pour public set
-        int Defense { get; set; } // modifié pour public set
+        int Attack { get; set; }
+        int Defense { get; set; }
         bool CanEvolve { get; }
         bool IsAlive { get; }
     }
@@ -638,7 +638,7 @@ namespace RPGConsole
             Console.WriteLine("=== Bienvenue dans le RPG Pokémon Textuel ===");
             Console.Write("Entre ton nom de dresseur : ");
             string trainerName = Console.ReadLine();
-            Console.Write("Ton âge : ");
+            Console.Write("Ton age : ");
             int age = int.Parse(Console.ReadLine());
 
             Trainer player = new Trainer(trainerName, age);
