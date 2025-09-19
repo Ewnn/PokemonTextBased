@@ -326,27 +326,45 @@ namespace RPGConsole
 
         public void UseItem()
         {
-            if (Inventory.Count == 0)
+            // Filtrer les items utilisables sur ses propres Pokémon (pas de Pokéball)
+            List<Item> usableItems = Inventory.FindAll(item => !(item is Pokeball));
+
+            if (usableItems.Count == 0)
             {
-                Console.WriteLine("Aucun item disponible.");
+                Console.WriteLine("Aucun item utilisable sur vos Pokémon disponibles.");
                 return;
             }
-            ShowInventory();
-            Console.WriteLine("\nChoisis un item à utiliser : ");
+
+            Console.WriteLine("\nInventaire (0 pour annuler) :");
+            for (int i = 0; i < usableItems.Count; i++)
+            {
+                Console.WriteLine((i + 1) + ". " + usableItems[i].Name);
+            }
+
+            Console.Write("\nChoisis un item à utiliser : ");
             if (!int.TryParse(Console.ReadLine(), out int choice))
             {
                 Console.WriteLine("Entrée invalide.");
                 return;
             }
-            choice -= 1;
-            if (choice >= 0 && choice < Inventory.Count)
+
+            if (choice == 0)
             {
-                Item item = Inventory[choice];
+                Console.WriteLine("Retour au menu de combat.");
+                return;
+            }
+
+            choice -= 1;
+
+            if (choice >= 0 && choice < usableItems.Count)
+            {
+                Item item = usableItems[choice];
+
                 Console.WriteLine("\nSur quel Pokémon ?");
                 ChooseActivePokemon();
                 if (ActivePokemon != null && item.Use(this, ActivePokemon))
                 {
-                    Inventory.RemoveAt(choice);
+                    Inventory.Remove(item);
                 }
             }
             else
