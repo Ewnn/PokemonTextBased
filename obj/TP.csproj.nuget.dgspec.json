@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Ewenn\\TP\\TP.csproj": {}
+    "C:\\Users\\boula\\Desktop\\PokemonTextBased\\TP.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Ewenn\\TP\\TP.csproj": {
+    "C:\\Users\\boula\\Desktop\\PokemonTextBased\\TP.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Ewenn\\TP\\TP.csproj",
+        "projectUniqueName": "C:\\Users\\boula\\Desktop\\PokemonTextBased\\TP.csproj",
         "projectName": "TP",
-        "projectPath": "C:\\Users\\Ewenn\\TP\\TP.csproj",
-        "packagesPath": "C:\\Users\\Ewenn\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Ewenn\\TP\\obj\\",
+        "projectPath": "C:\\Users\\boula\\Desktop\\PokemonTextBased\\TP.csproj",
+        "packagesPath": "C:\\Users\\boula\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\boula\\Desktop\\PokemonTextBased\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Ewenn\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\boula\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -59,7 +59,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "c:\\program files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
