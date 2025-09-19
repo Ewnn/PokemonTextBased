@@ -35,8 +35,8 @@ namespace RPGConsole
         public int Hp { get; set; }
         public int MaxXp { get; private set; }
         public int Xp { get; set; }
-        public int Attack { get; set; } // modifié
-        public int Defense { get; set; } // modifié
+        public int Attack { get; set; }
+        public int Defense { get; set; }
         private int BaseDefense;
         public bool CanEvolve { get; private set; }
         public bool IsAlive { get { return Hp > 0;} }
@@ -326,7 +326,6 @@ namespace RPGConsole
 
         public void UseItem()
         {
-            // Filtrer les items utilisables sur ses propres Pokémon (pas de Pokéball)
             List<Item> usableItems = Inventory.FindAll(item => !(item is Pokeball));
 
             if (usableItems.Count == 0)
@@ -443,7 +442,7 @@ namespace RPGConsole
             for(int i = 1; i <= levels; i++)
             {
                 Console.WriteLine("\n--- Niveau " + i + " ---");
-                EnemyTrainer ennemi = new EnemyTrainer("Dresseur Niv " + i, 20); // Correction : EnemyTrainer
+                EnemyTrainer ennemi = new EnemyTrainer("Dresseur Niv " + i, 20); 
                 ennemi.AddPokemon(PokemonFactory.CreateWildEnemy(player.Level + i));
                 ennemi.ChooseActivePokemon();
 
@@ -455,7 +454,7 @@ namespace RPGConsole
 
             // Boss
             Console.WriteLine("\n=== Boss du donjon ! ===");
-            EnemyTrainer boss = new EnemyTrainer("Boss du donjon", 50); // Correction : EnemyTrainer
+            EnemyTrainer boss = new EnemyTrainer("Boss du donjon", 50); 
             boss.AddPokemon(PokemonFactory.CreateWildEnemy(player.Level + levels + 2));
             boss.ChooseActivePokemon();
             BattleEngineTrainer combatBoss = new BattleEngineTrainer(player, boss);
