@@ -361,7 +361,7 @@ namespace RPGConsole
 
                 Console.WriteLine("\nSur quel Pokémon ?");
                 ChooseActivePokemon();
-                if (ActivePokemon != null && item.Use(this, ActivePokemon))
+                if (ActivePokemon != null && item.Use(this, ActivePokemon)) // Qu’il y a bien un Pokémon actif ET que l’objet (item) a bien été utilisé avec succès sur ce Pokémon
                 {
                     Inventory.Remove(item);
                 }
@@ -449,7 +449,10 @@ namespace RPGConsole
                 BattleEngineTrainer combat = new BattleEngineTrainer(player, ennemi);
                 combat.StartBattle();
 
-                if (player.ActivePokemon == null || !player.ActivePokemon.IsAlive) return;
+                if (player.ActivePokemon == null || !player.ActivePokemon.IsAlive)// Vérifie si le joueur n’a pas de Pokémon actif OU si le Pokémon actif n’est plus en vie
+                {
+                    return;
+                } 
             }
 
             // Boss
@@ -543,7 +546,7 @@ namespace RPGConsole
                     else enemy.Defend();
                 }
 
-                if (!player.ActivePokemon.IsAlive)
+                if (!player.ActivePokemon.IsAlive) // Vérifie si le Pokémon actif du joueur n’est pas en vie
                 {
                     Console.WriteLine(player.ActivePokemon.Name + " est KO ... Vous avez perdu !");
                     break;
